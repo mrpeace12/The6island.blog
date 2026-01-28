@@ -2,15 +2,13 @@ name: 24/7 News Bot
 
 on:
   schedule:
-    - cron: '0 */4 * * *'  # Every 4 hours at minute 0
-  workflow_dispatch:        # Manual trigger
-  push:                     # Run on code push
-    branches: [ main ]
+    - cron: '0 */4 * * *'  # Every 4 hours
+  workflow_dispatch:       # Manual trigger
 
 jobs:
-  run-news-bot:
+  run-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     
     steps:
     - name: Checkout code
@@ -26,12 +24,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests
         
-    - name: Run THE6ISLAND Perfect News Bot
+    - name: Run News Bot
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         NEWSDATA_KEY: ${{ secrets.NEWSDATA_KEY }}
         WP_TOKEN: ${{ secrets.WP_TOKEN }}
         SITE_ID: ${{ secrets.SITE_ID }}
-        GROQ_KEY: ${{ secrets.GROQ_KEY }}
-      run: python3 github_actions_perfect_bot.py
+      run: python3 github_bot.py
