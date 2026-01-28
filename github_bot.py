@@ -1,40 +1,71 @@
 #!/usr/bin/env python3
+"""
+THE6ISLAND.BLOG - GitHub Actions Bot
+"""
 import os
 import sys
 import requests
+from datetime import datetime
 
 print("="*60)
-print("🌐 TEST BOT - GitHub Actions")
+print("🌐 THE6ISLAND.BLOG - GITHUB ACTIONS BOT")
 print("="*60)
 
-# Debug: Show what's available
-print("Environment check:")
-for key in ['SUPABASE_URL', 'SUPABASE_KEY', 'NEWSDATA_KEY', 'WP_TOKEN', 'SITE_ID', 'GROQ_KEY']:
-    value = os.getenv(key)
-    if value:
-        print(f"✅ {key}: Set (length: {len(value)})")
+def log(message):
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    print(f"[{timestamp}] {message}")
+
+# Check environment
+log("Checking environment variables...")
+required = ['SUPABASE_URL', 'SUPABASE_KEY', 'NEWSDATA_KEY', 'WP_TOKEN', 'SITE_ID']
+missing = []
+for key in required:
+    if not os.getenv(key):
+        missing.append(key)
+        log(f"❌ {key}: Missing")
     else:
-        print(f"❌ {key}: Missing")
+        log(f"✅ {key}: Set")
 
-# Test Supabase connection
-print("\n📡 Testing Supabase connection...")
+if missing:
+    log(f"❌ Missing variables: {missing}")
+    sys.exit(1)
+
+log("✅ All environment variables loaded")
+
+# Test Supabase
 try:
-    supabase_url = os.getenv('SUPABASE_URL')
-    supabase_key = os.getenv('SUPABASE_KEY')
-    
-    if supabase_url and supabase_key:
-        response = requests.get(
-            f"{supabase_url}/rest/v1/bot_logs",
-            headers={"apikey": supabase_key, "Authorization": f"Bearer {supabase_key}"},
-            params={"select": "count"},
-            timeout=10
-        )
-        print(f"✅ Supabase connected: Status {response.status_code}")
-    else:
-        print("❌ Missing Supabase credentials")
+    log("Testing Supabase connection...")
+    response = requests.get(
+        f"{os.getenv('SUPABASE_URL')}/rest/v1/bot_logs",
+        headers={
+            "apikey": os.getenv('SUPABASE_KEY'),
+            "Authorization": f"Bearer {os.getenv('SUPABASE_KEY')}"
+        },
+        params={"select": "count"},
+        timeout=10
+    )
+    log(f"✅ Supabase connected: {response.status_code}")
 except Exception as e:
-    print(f"⚠️ Supabase test failed: {e}")
+    log(f"⚠️ Supabase test failed: {e}")
 
-print("\n" + "="*60)
-print("✅ GitHub Actions Bot Test Complete!")
 print("="*60)
+print("✅ GitHub Actions Bot Success!")
+print("="*60)
+
+# Log success to Supabase
+try:
+    requests.post(
+        f"{os.getenv('SUPABASE_URL')}/rest/v1/bot_logs",
+        headers={
+            "apikey": os.getenv('SUPABASE_KEY'),
+            "Authorization": f"Bearer {os.getenv('SUPABASE_KEY')}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "message": "[GitHub] Bot ran successfully",
+            "level": "info",
+            "created_at": datetime.now().isoformat() + "Z"
+        }
+    )
+except:
+    pass
