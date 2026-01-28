@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # THE6ISLAND.BLOG - 24/7 News Bot
 
 This repository contains an automated news bot that runs on GitHub Actions.
@@ -24,3 +25,7 @@ This repository contains an automated news bot that runs on GitHub Actions.
 
 ## Manual Run
 Go to Actions → 24/7 News Bot → Run workflow
+=======
+# The6island.blog
+Bot
+>>>>>>> 0b35fb569953989c976999c8cd16258a04e2c570
