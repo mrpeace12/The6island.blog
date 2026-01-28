@@ -28,4 +28,4 @@ jobs:
         NEWSDATA_KEY: "${{ secrets.NEWSDATA_KEY }}"
         WP_TOKEN: "${{ secrets.WP_TOKEN }}"
         SITE_ID: "${{ secrets.SITE_ID }}"
-      run: python3 test_bot.py
+      run: python3 github_bot.py
