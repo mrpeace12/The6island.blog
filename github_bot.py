@@ -4,14 +4,13 @@ THE6ISLAND.BLOG - 24/7 GitHub Actions Bot
 """
 import os
 import requests
+import json
 from datetime import datetime
-import sys
 
 print("="*60)
-print("🌐 THE6ISLAND.BLOG - GITHUB ACTIONS BOT")
+print("🌐 THE6ISLAND.BLOG - 24/7 NEWS BOT")
 print("="*60)
-print(f"Run started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
-print("="*60)
+print(f"🚀 Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
 
 # Get environment variables
 SUPABASE_URL = os.getenv('SUPABASE_URL')
@@ -21,7 +20,6 @@ WP_TOKEN = os.getenv('WP_TOKEN')
 SITE_ID = os.getenv('SITE_ID')
 
 def log(message):
-    """Simple logging"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] {message}")
     
@@ -41,16 +39,16 @@ def log(message):
             },
             timeout=5
         )
-    except:
-        pass
+    except Exception as e:
+        print(f"⚠️ Supabase log failed: {e}")
 
-# Check environment
-log("Checking environment variables...")
+# Validate environment
+log("Checking environment...")
 if not all([SUPABASE_URL, SUPABASE_KEY, NEWSDATA_KEY, WP_TOKEN, SITE_ID]):
     log("❌ Missing environment variables!")
-    sys.exit(1)
+    exit(1)
 
-log("✅ All environment variables present")
+log("✅ Environment OK")
 
 # Fetch news
 try:
@@ -63,7 +61,6 @@ try:
         articles = data.get('results', [])
         log(f"Found {len(articles)} articles")
         
-        # Process articles
         for article in articles:
             title = article.get('title', '').strip()
             if not title:
@@ -74,7 +71,7 @@ try:
                 if title.startswith(prefix):
                     title = title[len(prefix):]
             
-            description = article.get('description', '') or article.get('content', 'No description available.')
+            description = article.get('description', '') or article.get('content', '')
             source = article.get('source_id', 'International News').upper()
             
             # Create HTML
@@ -95,41 +92,45 @@ try:
                 <div style="margin-top:30px; padding:15px; background:#f8f9fa; border-radius:5px;">
                     <p style="margin:0; color:#666;">
                         <strong>🌐 THE6ISLAND.BLOG 24/7 NEWS NETWORK</strong><br>
-                        Automated news aggregation • Updated every 4 hours • GitHub Actions
+                        Automated news aggregation • Updated every 4 hours
                     </p>
                 </div>
             </div>
             """
             
             # Post to WordPress
-            wp_response = requests.post(
-                f"https://public-api.wordpress.com/rest/v1.1/sites/{SITE_ID}/posts/new",
-                headers={
-                    "Authorization": f"Bearer {WP_TOKEN}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "title": title[:80],
-                    "content": html_content,
-                    "status": "publish",
-                    "categories": ["GEOPOLITICS", "GITHUB-BOT"],
-                    "tags": ["auto-news", "24-7", "the6island"]
-                },
-                timeout=30
-            )
-            
-            if wp_response.status_code in [200, 201]:
-                log(f"✅ Posted: {title[:50]}...")
-            else:
-                log(f"❌ WordPress error: {wp_response.status_code}")
+            try:
+                wp_response = requests.post(
+                    f"https://public-api.wordpress.com/rest/v1.1/sites/{SITE_ID}/posts/new",
+                    headers={
+                        "Authorization": f"Bearer {WP_TOKEN}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "title": title[:80],
+                        "content": html_content,
+                        "status": "publish",
+                        "categories": ["GEOPOLITICS", "24-7-NEWS"],
+                        "tags": ["github-actions", "auto-news", "the6island"]
+                    },
+                    timeout=30
+                )
+                
+                if wp_response.status_code in [200, 201]:
+                    log(f"✅ Posted: {title[:50]}...")
+                else:
+                    log(f"❌ WordPress error: {wp_response.status_code}")
+                    
+            except Exception as e:
+                log(f"❌ Post error: {e}")
                 
     else:
         log(f"❌ News API error: {response.status_code}")
         
 except Exception as e:
-    log(f"❌ Error: {str(e)}")
+    log(f"❌ Main error: {e}")
 
 log("✅ Bot run completed")
 print("="*60)
-print(f"⏰ Next run scheduled in 4 hours")
+print(f"⏰ Next run: 4 hours via GitHub Actions")
 print("="*60)
