@@ -21,6 +21,9 @@ jobs:
     - name: Install requests
       run: pip install requests
       
+    - name: Debug - List files
+      run: ls -la
+      
     - name: Run Bot
       env:
         SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
@@ -28,4 +31,15 @@ jobs:
         NEWSDATA_KEY: "${{ secrets.NEWSDATA_KEY }}"
         WP_TOKEN: "${{ secrets.WP_TOKEN }}"
         SITE_ID: "${{ secrets.SITE_ID }}"
-      run: python3 github_bot.py
+      run: |
+        echo "=== STARTING BOT ==="
+        # Try to run whatever Python file exists
+        if [ -f "github_bot.py" ]; then
+          python3 github_bot.py
+        elif [ -f "test_bot.py" ]; then
+          python3 test_bot.py
+        else
+          echo "ERROR: No Python bot file found!"
+          ls -la *.py
+          exit 1
+        fi
