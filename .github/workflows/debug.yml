@@ -11,46 +11,23 @@ jobs:
       uses: actions/checkout@v3
       
     - name: Debug Info
+      env:
+        GROQ_KEY: "${{ secrets.GROQ_KEY }}"
       run: |
         echo "=== DEBUG INFORMATION ==="
-        echo "Current directory: $(pwd)"
-        echo "Files in repo:"
-        ls -la
-        echo ""
-        echo "Python files:"
-        ls -la *.py
-        echo ""
-        echo "Workflow files:"
-        ls -la .github/workflows/
-        echo ""
-        echo "=== ENVIRONMENT CHECK ==="
-        echo "Checking if secrets are set..."
-        if [ -n "$SUPABASE_URL" ]; then
-          echo "✅ SUPABASE_URL is set (length: ${#SUPABASE_URL})"
-        else
-          echo "❌ SUPABASE_URL is NOT set"
-        fi
+        echo "Checking ALL 6 secrets..."
         
-        if [ -n "$SUPABASE_KEY" ]; then
-          echo "✅ SUPABASE_KEY is set (length: ${#SUPABASE_KEY})"
-        else
-          echo "❌ SUPABASE_KEY is NOT set"
-        fi
+        secrets=("SUPABASE_URL" "SUPABASE_KEY" "NEWSDATA_KEY" "WP_TOKEN" "SITE_ID" "GROQ_KEY")
+        for secret in "${secrets[@]}"; do
+          if [ -n "${!secret}" ]; then
+            echo "✅ $secret is set (length: ${#!secret})"
+          else
+            echo "❌ $secret is NOT set"
+          fi
+        done
         
-        if [ -n "$NEWSDATA_KEY" ]; then
-          echo "✅ NEWSDATA_KEY is set (length: ${#NEWSDATA_KEY})"
-        else
-          echo "❌ NEWSDATA_KEY is NOT set"
-        fi
-        
-        if [ -n "$SITE_ID" ]; then
-          echo "✅ SITE_ID is set: $SITE_ID"
-        else
-          echo "❌ SITE_ID is NOT set"
-        fi
         echo ""
-        echo "=== PYTHON TEST ==="
-        python3 -c "print('Python works!'); import requests; print('Requests imported!')"
+        echo "Total secrets loaded: $(env | grep -c 'SUPABASE\|NEWSDATA\|WP_TOKEN\|SITE_ID\|GROQ_KEY')/6"
         
     - name: Test Bot Script
       env:
@@ -59,10 +36,7 @@ jobs:
         NEWSDATA_KEY: "${{ secrets.NEWSDATA_KEY }}"
         WP_TOKEN: "${{ secrets.WP_TOKEN }}"
         SITE_ID: "${{ secrets.SITE_ID }}"
+        GROQ_KEY: "${{ secrets.GROQ_KEY }}"
       run: |
         echo "=== TESTING BOT SCRIPT ==="
-        if [ -f "github_bot.py" ]; then
-          python3 github_bot.py
-        else
-          echo "❌ github_bot.py not found!"
-        fi
+        python3 github_bot.py
