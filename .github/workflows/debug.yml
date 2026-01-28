@@ -23,22 +23,42 @@ jobs:
         echo "Workflow files:"
         ls -la .github/workflows/
         echo ""
-        echo "=== ENVIRONMENT ==="
-        echo "SUPABASE_URL length: ${#SUPABASE_URL}"
-        echo "SUPABASE_KEY length: ${#SUPABASE_KEY}"
-        echo "NEWSDATA_KEY length: ${#NEWSDATA_KEY}"
-        echo "SITE_ID: $SITE_ID"
+        echo "=== ENVIRONMENT CHECK ==="
+        echo "Checking if secrets are set..."
+        if [ -n "$SUPABASE_URL" ]; then
+          echo "✅ SUPABASE_URL is set (length: ${#SUPABASE_URL})"
+        else
+          echo "❌ SUPABASE_URL is NOT set"
+        fi
+        
+        if [ -n "$SUPABASE_KEY" ]; then
+          echo "✅ SUPABASE_KEY is set (length: ${#SUPABASE_KEY})"
+        else
+          echo "❌ SUPABASE_KEY is NOT set"
+        fi
+        
+        if [ -n "$NEWSDATA_KEY" ]; then
+          echo "✅ NEWSDATA_KEY is set (length: ${#NEWSDATA_KEY})"
+        else
+          echo "❌ NEWSDATA_KEY is NOT set"
+        fi
+        
+        if [ -n "$SITE_ID" ]; then
+          echo "✅ SITE_ID is set: $SITE_ID"
+        else
+          echo "❌ SITE_ID is NOT set"
+        fi
         echo ""
         echo "=== PYTHON TEST ==="
         python3 -c "print('Python works!'); import requests; print('Requests imported!')"
         
     - name: Test Bot Script
       env:
-        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        NEWSDATA_KEY: ${{ secrets.NEWSDATA_KEY }}
-        WP_TOKEN: ${{ secrets.WP_TOKEN }}
-        SITE_ID: ${{ secrets.SITE_ID }}
+        SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
+        SUPABASE_KEY: "${{ secrets.SUPABASE_KEY }}"
+        NEWSDATA_KEY: "${{ secrets.NEWSDATA_KEY }}"
+        WP_TOKEN: "${{ secrets.WP_TOKEN }}"
+        SITE_ID: "${{ secrets.SITE_ID }}"
       run: |
         echo "=== TESTING BOT SCRIPT ==="
         if [ -f "github_bot.py" ]; then
