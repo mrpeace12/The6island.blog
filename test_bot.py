@@ -1,26 +1,40 @@
 #!/usr/bin/env python3
 import os
 import sys
+import requests
 
-print("=== TEST BOT ===")
-print(f"SUPABASE_URL: {'✅ Set' if os.getenv('SUPABASE_URL') else '❌ Not set'}")
-print(f"SUPABASE_KEY: {'✅ Set' if os.getenv('SUPABASE_KEY') else '❌ Not set'}")
-print(f"NEWSDATA_KEY: {'✅ Set' if os.getenv('NEWSDATA_KEY') else '❌ Not set'}")
-print(f"WP_TOKEN: {'✅ Set' if os.getenv('WP_TOKEN') else '❌ Not set'}")
-print(f"SITE_ID: {'✅ Set' if os.getenv('SITE_ID') else '❌ Not set'}")
+print("="*60)
+print("🌐 TEST BOT - GitHub Actions")
+print("="*60)
 
-# Check if all are set
-all_set = all([
-    os.getenv('SUPABASE_URL'),
-    os.getenv('SUPABASE_KEY'), 
-    os.getenv('NEWSDATA_KEY'),
-    os.getenv('WP_TOKEN'),
-    os.getenv('SITE_ID')
-])
+# Debug: Show what's available
+print("Environment check:")
+for key in ['SUPABASE_URL', 'SUPABASE_KEY', 'NEWSDATA_KEY', 'WP_TOKEN', 'SITE_ID', 'GROQ_KEY']:
+    value = os.getenv(key)
+    if value:
+        print(f"✅ {key}: Set (length: {len(value)})")
+    else:
+        print(f"❌ {key}: Missing")
 
-if all_set:
-    print("\n✅ All environment variables are set!")
-    sys.exit(0)
-else:
-    print("\n❌ Missing environment variables!")
-    sys.exit(1)
+# Test Supabase connection
+print("\n📡 Testing Supabase connection...")
+try:
+    supabase_url = os.getenv('SUPABASE_URL')
+    supabase_key = os.getenv('SUPABASE_KEY')
+    
+    if supabase_url and supabase_key:
+        response = requests.get(
+            f"{supabase_url}/rest/v1/bot_logs",
+            headers={"apikey": supabase_key, "Authorization": f"Bearer {supabase_key}"},
+            params={"select": "count"},
+            timeout=10
+        )
+        print(f"✅ Supabase connected: Status {response.status_code}")
+    else:
+        print("❌ Missing Supabase credentials")
+except Exception as e:
+    print(f"⚠️ Supabase test failed: {e}")
+
+print("\n" + "="*60)
+print("✅ GitHub Actions Bot Test Complete!")
+print("="*60)

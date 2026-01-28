@@ -2,33 +2,33 @@ name: 24/7 News Bot
 
 on:
   schedule:
-    - cron: '0 */4 * * *'  # Every 4 hours at minute 0
-  workflow_dispatch:        # Manual trigger
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
+      
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-
+        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install requests beautifulsoup4
-
-    - name: Run THE6ISLAND News Bot
+        pip install requests
+        
+    - name: Run Bot
       env:
         SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
         SUPABASE_KEY: "${{ secrets.SUPABASE_KEY }}"
         NEWSDATA_KEY: "${{ secrets.NEWSDATA_KEY }}"
         WP_TOKEN: "${{ secrets.WP_TOKEN }}"
         SITE_ID: "${{ secrets.SITE_ID }}"
-      run: python3 github_bot.py
+      run: python3 test_bot.py
