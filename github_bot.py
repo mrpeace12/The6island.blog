@@ -10,19 +10,20 @@ from datetime import datetime
 print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
 print()
 
-# Check secrets
+# Check ALL secrets
 secrets = {
     'SUPABASE_URL': os.getenv('SUPABASE_URL'),
     'SUPABASE_KEY': os.getenv('SUPABASE_KEY'),
     'NEWSDATA_KEY': os.getenv('NEWSDATA_KEY'),
     'WP_TOKEN': os.getenv('WP_TOKEN'),
-    'SITE_ID': os.getenv('SITE_ID')
+    'SITE_ID': os.getenv('SITE_ID'),
+    'GROQ_KEY': os.getenv('GROQ_KEY')  # ADD THIS!
 }
 
 all_good = True
 for name, value in secrets.items():
     if value:
-        print(f"✅ {name}: Set")
+        print(f"✅ {name}: Set (length: {len(value)})")
     else:
         print(f"❌ {name}: Missing")
         all_good = False
@@ -30,7 +31,7 @@ for name, value in secrets.items():
 print()
 print("="*60)
 if all_good:
-    print("🎉 SUCCESS! All secrets loaded correctly!")
+    print("🎉 SUCCESS! All 6 secrets loaded correctly!")
     sys.exit(0)
 else:
     print("⚠️ Some secrets are missing")

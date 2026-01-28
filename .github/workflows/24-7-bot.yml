@@ -21,9 +21,6 @@ jobs:
     - name: Install requests
       run: pip install requests
       
-    - name: List files (debug)
-      run: ls -la
-      
     - name: Run GitHub Bot
       env:
         SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
@@ -31,4 +28,5 @@ jobs:
         NEWSDATA_KEY: "${{ secrets.NEWSDATA_KEY }}"
         WP_TOKEN: "${{ secrets.WP_TOKEN }}"
         SITE_ID: "${{ secrets.SITE_ID }}"
+        GROQ_KEY: "${{ secrets.GROQ_KEY }}"  # ADD THIS LINE!
       run: python3 github_bot.py
